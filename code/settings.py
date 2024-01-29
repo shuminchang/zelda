@@ -34,3 +34,9 @@ weapon_data = {
 	'axe': {'cooldown': 300, 'damage': 20, 'graphic': os.path.join(dir_path, 'graphics', 'weapons', 'axe', 'full.png')},
 	'rapier':{'cooldown': 50, 'damage': 8, 'graphic': os.path.join(dir_path, 'graphics', 'weapons', 'rapier', 'full.png')},
 	'sai':{'cooldown': 80, 'damage': 10, 'graphic': os.path.join(dir_path, 'graphics', 'weapons', 'sai', 'full.png')}}
+
+# magic
+magic_data = {
+    'flame': {'strength': 5, 'cost': 20, 'graphic': os.path.join(dir_path, 'graphics', 'particles', 'flame', 'fire.png')},
+    'heal': {'strength': 20, 'cost': 10, 'graphic': os.path.join(dir_path, 'graphics', 'particles', 'heal', 'heal.png')}
+}
