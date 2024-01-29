@@ -13,7 +13,7 @@ BAR_HEIGHT = 20
 HEALTH_BAR_WIDTH = 200
 ENERGY_BAR_WIDTH = 140
 ITEM_BOX_SIZE = 80
-UI_FONT = os.path.join(dir_path, 'graphics\\font\\joystix.ttf')
+UI_FONT = os.path.join(dir_path, 'graphics', 'font', 'joystix.ttf')
 UI_FONT_SIZE = 18
 
 # general colors
@@ -29,8 +29,8 @@ UI_BORDER_COLOR_ACTIVE = 'gold'
 
 # weapons 
 weapon_data = {
-	'sword': {'cooldown': 100, 'damage': 15,'graphic': os.path.join(dir_path, 'graphics\\weapons\\sword\\full.png')},
-	'lance': {'cooldown': 400, 'damage': 30,'graphic': os.path.join(dir_path, 'graphics\\weapons\\lance\\full.png')},
-	'axe': {'cooldown': 300, 'damage': 20, 'graphic': os.path.join(dir_path, 'graphics\\weapons\\axe\\full.png')},
-	'rapier':{'cooldown': 50, 'damage': 8, 'graphic': os.path.join(dir_path, 'graphics\\weapons\\rapier\\full.png')},
-	'sai':{'cooldown': 80, 'damage': 10, 'graphic': os.path.join(dir_path, 'graphics\\weapons\\sai\\full.png')}}
+	'sword': {'cooldown': 100, 'damage': 15,'graphic': os.path.join(dir_path, 'graphics', 'weapons', 'sword', 'full.png')},
+	'lance': {'cooldown': 400, 'damage': 30,'graphic': os.path.join(dir_path, 'graphics', 'weapons', 'lance', 'full.png')},
+	'axe': {'cooldown': 300, 'damage': 20, 'graphic': os.path.join(dir_path, 'graphics', 'weapons', 'axe', 'full.png')},
+	'rapier':{'cooldown': 50, 'damage': 8, 'graphic': os.path.join(dir_path, 'graphics', 'weapons', 'rapier', 'full.png')},
+	'sai':{'cooldown': 80, 'damage': 10, 'graphic': os.path.join(dir_path, 'graphics', 'weapons', 'sai', 'full.png')}}
