@@ -39,6 +39,8 @@ class Level:
         self.animation_player = AnimationPlayer()
         self.magic_player = MagicPlayer(self.animation_player)
 
+        self.game_over = False
+
     def create_map(self):
         layouts = {
             'boundary': import_csv_layout(os.path.join(dir_path, 'map', 'map_FloorBlocks.csv')),
@@ -140,15 +142,45 @@ class Level:
         self.game_paused = not self.game_paused
 
     def run(self):
+        # Check for game over
+        if self.player.health <= 0:
+            self.game_over = True
+
         self.visible_sprites.custom_draw(self.player)
         self.ui.display(self.player)
-        
+
         if self.game_paused:
             self.upgrade.display()
-        else:
+        elif not self.game_over:
+            # Update and logic processing
             self.visible_sprites.update()
             self.visible_sprites.enemy_update(self.player)
             self.player_attack_logic()
+        else:
+            self.display_game_over()
+
+    def display_game_over(self):
+        # Create a semi-transparent surface to darken the background
+        overlay = pygame.Surface(self.display_surface.get_size())
+        overlay.set_alpha(128)  # Adjust alpha for desired darkness (0-255)
+        overlay.fill((0, 0, 0))  # Fill with black color
+        self.display_surface.blit(overlay, (0, 0))  # Draw the overlay
+
+        # Display game over message
+        font = pygame.font.Font(None, 74)
+        text = font.render('Game Over', True, (255, 0, 0))  # Red color for Game Over
+        text_rect = text.get_rect(center=(self.display_surface.get_width() // 2, self.display_surface.get_height() // 2))
+        self.display_surface.blit(text, text_rect)
+
+        # Display restart message
+        restart_font = pygame.font.Font(None, 50)
+        restart_text = restart_font.render('Press any key to restart', True, (255, 255, 255))  # White color for restart text
+        restart_rect = restart_text.get_rect(center=(self.display_surface.get_width() // 2, self.display_surface.get_height() // 2 + 50))
+        self.display_surface.blit(restart_text, restart_rect)
+
+    def restart_game(self):
+        # Reset the game state
+        self.__init__()
 
 class YSortCameraGroup(pygame.sprite.Group):
     def __init__(self):
