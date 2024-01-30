@@ -39,8 +39,8 @@ class Player(Entity):
 
         # status
         self.stats = {'health': 100, 'energy': 60, 'attack': 10, 'magic': 4, 'speed': 5, 'resistance': 3}
-        self.max_stats = {'health': 300, 'energy': 140, 'attack': 20, 'magic': 10, 'speed': 10}
-        self.upgrade_cost = {'health': 100, 'energy': 100, 'attack': 100, 'magic': 100, 'speed': 100}
+        self.max_stats = {'health': 300, 'energy': 140, 'attack': 20, 'magic': 10, 'speed': 10, 'resistance': 3}
+        self.upgrade_cost = {'health': 100, 'energy': 100, 'attack': 100, 'magic': 100, 'speed': 100, 'resistance': 3}
         self.health = self.stats['health'] * 0.5
         self.energy = self.stats['energy'] * 0.8
         self.exp = 5000
@@ -213,9 +213,20 @@ class Player(Entity):
             self.direction *= -self.resistance
 
             # Apply knockback
+            original_position = self.hitbox.topleft
             self.hitbox.x += self.resistance
             self.hitbox.y += self.resistance
             self.rect.center = self.hitbox.center
+
+            # Check for collision
+            for obstacle in self.obstacle_sprites:
+                if self.hitbox.colliderect(obstacle.rect):
+                    # Adjust position to prevent moving through the obstacle
+                    self.hitbox.topleft = original_position
+                    break
+            else:
+                # Update player's rect if no collision
+                self.rect.center = self.hitbox.center
 
     # def hit_reaction(self):
     #     if not self.vulnerable:
