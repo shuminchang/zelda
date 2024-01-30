@@ -1,3 +1,4 @@
+from random import choice
 import pygame
 from settings import *
 from entity import Entity
@@ -53,6 +54,11 @@ class Enemy(Entity):
         self.hit_sound.set_volume(0.6)
         self.attack_sound.set_volume(0.3)
 
+        # wandering behavior
+        self.set_random_wander_direction()
+        self.wander_change_time = 0
+        self.wander_cooldown = 1000  # Time in milliseconds
+
     def import_graphics(self, name):
         self.animations = {'idle': [], 'move': [], 'attack': []}
         main_path = os.path.join(dir_path, 'graphics', 'monsters', name)
@@ -91,7 +97,7 @@ class Enemy(Entity):
         elif self.status == 'move':
             self.direction = self.get_player_distance_direction(player)[1]
         else:
-            self.direction = pygame.math.Vector2()
+            self.direction = self.wander_direction
 
     def animate(self):
         animation = self.animations[self.status]
@@ -111,6 +117,13 @@ class Enemy(Entity):
         else:
             self.image.set_alpha(255)
 
+    def set_random_wander_direction(self):
+        while True:
+            self.wander_direction = pygame.math.Vector2(choice([-1, 0, 1]), choice([-1, 0, 1]))
+            if self.wander_direction.length() > 0:
+                self.wander_direction.normalize()
+                break
+
     def cooldowns(self):
         current_time = pygame.time.get_ticks()
         if not self.can_attack:
@@ -120,6 +133,11 @@ class Enemy(Entity):
         if not self.vulnerable:
             if current_time - self.hit_time >= self.invincibility_duration:
                 self.vulnerable = True
+
+        # Change wandering direction periodically
+        if self.status == 'idle' and current_time - self.wander_change_time > self.wander_cooldown:
+            self.set_random_wander_direction()
+            self.wander_change_time = current_time
 
     def get_damage(self, player, attack_type):
         if self.vulnerable:
