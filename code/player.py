@@ -1,3 +1,4 @@
+from random import choice
 import pygame
 from settings import *
 from support import import_folder
@@ -16,7 +17,7 @@ class Player(Entity):
 
         # movement
         self.attacking = False
-        self.attack_cooldown = 400
+        self.attack_cooldown = 100
         self.attack_time = 0
         self.obstacle_sprites = obstacle_sprites
 
@@ -37,13 +38,14 @@ class Player(Entity):
         self.magic_switch_time = None
 
         # status
-        self.stats = {'health': 100, 'energy': 60, 'attack': 10, 'magic': 4, 'speed': 5}
+        self.stats = {'health': 100, 'energy': 60, 'attack': 10, 'magic': 4, 'speed': 5, 'resistance': 3}
         self.max_stats = {'health': 300, 'energy': 140, 'attack': 20, 'magic': 10, 'speed': 10}
         self.upgrade_cost = {'health': 100, 'energy': 100, 'attack': 100, 'magic': 100, 'speed': 100}
         self.health = self.stats['health'] * 0.5
         self.energy = self.stats['energy'] * 0.8
         self.exp = 5000
         self.speed = self.stats['speed']
+        self.resistance = self.stats['resistance']
 
         # damage timer
         self.vulnerable = True
@@ -206,10 +208,33 @@ class Player(Entity):
         else:
             self.energy = self.stats['energy']
 
+    def hit_reaction(self):
+        if not self.vulnerable:
+            self.direction *= -self.resistance
+
+            # Apply knockback
+            self.hitbox.x += self.resistance
+            self.hitbox.y += self.resistance
+            self.rect.center = self.hitbox.center
+
+    # def hit_reaction(self):
+    #     if not self.vulnerable:
+    #         # Default or random knockback direction
+    #         knockback_direction = pygame.math.Vector2(choice([-1, 1]), choice([-1, 1])).normalize()
+
+    #         knockback_strength = 5  # Adjust this value as needed
+    #         knockback_vector = knockback_direction * knockback_strength
+
+    #         # Apply knockback
+    #         self.hitbox.x += knockback_vector.x
+    #         self.hitbox.y += knockback_vector.y
+    #         self.rect.center = self.hitbox.center
+
     def update(self):
         self.input()
         self.cooldowns()
         self.get_status()
         self.animate()
+        self.hit_reaction()
         self.move(self.stats['speed'])
         self.energy_recovery()
