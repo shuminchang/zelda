@@ -32,7 +32,12 @@ class Game:
                             self.level.toggle_menu()
             
             self.screen.fill(WATER_COLOR)
-            self.level.run()
+
+            if self.level.transitioning:
+                self.level.handle_transition(self.screen)
+            else:
+                self.level.run()
+                
             pygame.display.update()
             self.clock.tick(FPS)
 

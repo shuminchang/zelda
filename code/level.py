@@ -41,6 +41,14 @@ class Level:
 
         self.game_over = False
 
+        # need to find better coordinates
+        self.next_level_trigger_position = (2500, 1344)
+        self.player_has_moved = False
+
+        self.transitioning = False
+        self.transition_alpha = 0
+        self.transition_speed = 5  # Speed of fade in/out
+
     def create_map(self):
         layouts = {
             'boundary': import_csv_layout(os.path.join(dir_path, 'map', 'map_FloorBlocks.csv')),
@@ -141,6 +149,57 @@ class Level:
     def toggle_menu(self):
         self.game_paused = not self.game_paused
 
+    # def check_for_next_level(self):
+    #     if self.player.rect.topleft == self.next_level_trigger_position:
+    #         self.start_next_level()
+
+    def check_for_next_level(self):
+        trigger_x, trigger_y = self.next_level_trigger_position
+        player_x, player_y = self.player.rect.topleft
+
+        # Define a tolerance range
+        tolerance = TILESIZE
+
+        within_tolerance = (trigger_x - tolerance <= player_x <= trigger_x + tolerance and
+                            trigger_y - tolerance <= player_y <= trigger_y + tolerance)
+
+        if within_tolerance and self.player_has_moved:
+            self.start_transition()  # Start the transition instead of directly starting the next level
+
+        # Set player_has_moved to True only if the player moves outside the tolerance range
+        if not within_tolerance:
+            self.player_has_moved = True
+
+    def start_next_level(self):
+        # Logic to start the next level
+        # This could involve loading a new map, resetting states, etc.
+        # For simplicity, here we just call __init__ to reset the level
+        self.__init__()
+
+    def handle_transition(self, screen):
+        if self.transitioning:
+            self.transition_alpha += self.transition_speed
+            if self.transition_alpha >= 255:
+                self.start_next_level()  # Reset level and start next level
+                self.transitioning = False
+                self.transition_alpha = 0
+            else:
+                # Draw a semi-transparent surface over the screen
+                overlay = pygame.Surface(screen.get_size())
+                overlay.fill((0, 0, 0))
+                overlay.set_alpha(self.transition_alpha)
+                screen.blit(overlay, (0, 0))
+
+                # Display game over message
+                font = pygame.font.Font(None, 74)
+                text = font.render('NEXT LEVEL', True, (255, 0, 0))  # Red color for Game Over
+                text_rect = text.get_rect(center=(self.display_surface.get_width() // 2, self.display_surface.get_height() // 2))
+                self.display_surface.blit(text, text_rect)
+
+    def start_transition(self):
+        self.transitioning = True
+        self.transition_alpha = 0
+
     def run(self):
         # Check for game over
         if self.player.health <= 0:
@@ -153,6 +212,7 @@ class Level:
             self.upgrade.display()
         elif not self.game_over:
             # Update and logic processing
+            self.check_for_next_level()
             self.visible_sprites.update()
             self.visible_sprites.enemy_update(self.player)
             self.player_attack_logic()
