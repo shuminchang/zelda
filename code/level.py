@@ -11,6 +11,7 @@ from enemy import Enemy
 from particles import AnimationPlayer
 from magic import MagicPlayer
 from upgrade import Upgrade
+from arrow import Arrow
 
 class Level:
     def __init__(self):
@@ -27,6 +28,7 @@ class Level:
         self.current_attack = None
         self.attack_sprites = pygame.sprite.Group()
         self.attackable_sprites = pygame.sprite.Group()
+        self.arrow_sprites = pygame.sprite.Group()
 
         # sprite group setup
         self.create_map()
@@ -105,6 +107,9 @@ class Level:
 
     def create_attack(self):
         self.current_attack = Weapon(self.player, [self.visible_sprites, self.attack_sprites])
+        if self.player.weapon == 'bow':
+            Arrow(self.player, [self.visible_sprites, self.arrow_sprites], self.obstacle_sprites, self.attackable_sprites)
+            
 
     def create_magic(self, style, strength, cost):
         if style == 'heal':
@@ -132,6 +137,28 @@ class Level:
                             target_sprite.kill()
                         else:
                             target_sprite.get_damage(self.player, attack_sprite.sprite_type)
+
+        if self.arrow_sprites:
+            for arrow_sprite in self.arrow_sprites:
+                collision_sprites = pygame.sprite.spritecollide(arrow_sprite, self.attackable_sprites, False)
+                collision_obstacle_sprites = pygame.sprite.spritecollide(arrow_sprite, self.obstacle_sprites, False)
+                if collision_sprites:
+                    for target_sprite in collision_sprites:
+                        if target_sprite.sprite_type == 'grass':
+                            pos = target_sprite.rect.center
+                            offset = pygame.math.Vector2(0, 75)
+                            for leaf in range(randint(3, 6)):
+                                self.animation_player.create_grass_particles(pos - offset, [self.visible_sprites])
+                            target_sprite.kill()
+                            arrow_sprite.kill()
+                        else:
+                            target_sprite.get_damage(self.player, arrow_sprite.sprite_type)
+                            arrow_sprite.kill()
+
+                if collision_obstacle_sprites:
+                    for target_sprite in collision_obstacle_sprites:
+                        if target_sprite.sprite_type != 'invisible':
+                            arrow_sprite.kill()
 
     def damage_player(self, amount, attack_type):
         if self.player.vulnerable:
